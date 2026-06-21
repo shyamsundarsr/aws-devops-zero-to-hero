@@ -1,32 +1,18 @@
-# --- Stage 1: Build Stage ---
-# Use a slim image to install dependencies
-FROM python:3.11-slim AS builder
+# app.py
 
-WORKDIR /app
+from flask import Flask
 
-# Install dependencies into a virtual environment to keep things clean
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+app = Flask(__name__)
 
-# Copy and install requirements (assuming you have a requirements.txt)
-# For just Flask, you can run: RUN pip install flask
-RUN pip install --no-cache-dir flask
+# Route to the root URL
+@app.route('/')
+def hello():
+    return 'Hello, Flask on Docker!'
 
-# --- Stage 2: Final Run Stage ---
-# Use the same slim image for the final, clean layer
-FROM python:3.11-slim
+# Route to a custom endpoint
+@app.route('/greet/<name>')
+def greet(name):
+    return f'Hello, {name}! Welcome to Flask on Docker.'
 
-WORKDIR /app
-
-# Copy the virtual environment from the builder stage
-COPY --from=builder /opt/venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Copy your application code
-COPY app.py .
-
-# Expose the port your app runs on
-EXPOSE 3000
-
-# Run the application
-CMD ["python", "app.py"]
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=3000)
