@@ -3,7 +3,7 @@
 Download IAM policy
 
 ```
-curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json
+curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.11.0/docs/install/iam_policy.json
 ```
 
 Create IAM Policy
@@ -43,12 +43,11 @@ helm repo update eks
 Install
 
 ```
-helm install aws-load-balancer-controller eks/aws-load-balancer-controller \            
-  -n kube-system \
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system \
   --set clusterName=<your-cluster-name> \
   --set serviceAccount.create=false \
   --set serviceAccount.name=aws-load-balancer-controller \
-  --set region=<region> \
+  --set region=<your-region> \
   --set vpcId=<your-vpc-id>
 ```
 
@@ -57,6 +56,3 @@ Verify that the deployments are running.
 ```
 kubectl get deployment -n kube-system aws-load-balancer-controller
 ```
-
-
-
