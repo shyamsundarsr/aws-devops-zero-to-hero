@@ -1,20 +1,32 @@
-# Use the official Python image as the base image
-FROM python:3.9
+# --- Stage 1: Build Stage ---
+# Use a slim image to install dependencies
+FROM python:3.11-slim AS builder
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the Python dependencies file to the container
-COPY requirements.txt .
+# Install dependencies into a virtual environment to keep things clean
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Install the Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy and install requirements (assuming you have a requirements.txt)
+# For just Flask, you can run: RUN pip install flask
+RUN pip install --no-cache-dir flask
 
-# Copy the Flask application code to the container
+# --- Stage 2: Final Run Stage ---
+# Use the same slim image for the final, clean layer
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy the virtual environment from the builder stage
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy your application code
 COPY app.py .
 
-# Expose the port the Flask application will run on
+# Expose the port your app runs on
 EXPOSE 3000
 
-# Command to run the Flask application when the container starts
+# Run the application
 CMD ["python", "app.py"]
